@@ -1,33 +1,32 @@
 % Add Constraint Logic Programming over Integers 
 :- use_module(library(clpfd)).
 
-% Imperative Programming: Programs are sequences of instructions. You tell the machine, step by step,
-%                         *how* to get what you want. Lots of control statements, mutation everywhere, etc.
-%                         These make it harder to understand what the code is really doing (try it without a
-%                         single-step debugger). Can you reason about it without simulating the machine in 
-%                         your head?
+% Imperative Programming: Programs are sequences of instructions. You tell the machine, step by 
+% step, *how* to get what you want. Lots of control statements, mutation everywhere, etc.  These 
+% make it harder to understand what the code is really doing (try it without a single-step 
+% debugger). Can you reason about it without simulating the machine in your head?
 %
-% Functional Programming: Programs are functions (in the sense of mathematics). You tell the machine 
-%                         which functions to compose to get what you want. No mutation, but you still own the
-%                         control flow (if/then, case expressions, etc.). Easier to reason about as long as you
-%                         can understand the control flow. Functions satisfy equations, e.g. fib(n+2) = fib(n+1) +
-%                         fib(n), enabling *equational reasoning*.
+% Functional Programming: Programs are functions (in the sense of mathematics). You tell the 
+% machine which functions to compose to get what you want. No mutation, but you still own the
+% control flow (if/then, case expressions, etc.). Easier to reason about as long as you can 
+% understand the control flow. Functions satisfy equations, e.g. fib(n+2) = fib(n+1) + fib(n), 
+% enabling *equational reasoning*.
 %
-% Logic Programming:      Programs are queries against relations (in the sense of mathematics). You tell the machine
-%                         1) facts about these relations and 2) rules to infer new facts. Composition is by
-%                         conjunciton and disjunction of predicates. No mutation, and no explicit control flow. 
-%                         Similar to querying relations in SQL, but more powerful. 
+% Logic Programming: Programs are queries against relations (in the sense of mathematics). You tell
+% the machine 1) facts about these relations and 2) rules to infer new facts. Composition is by
+% conjunciton and disjunction of predicates. No mutation, and no explicit control flow. Similar 
+% to querying relations in SQL, but more powerful. 
 % 
-% Declarative Programming: Say *what you want*, not *how to get it*. The details of how to get it are left to the
-%                          computer to figure out. All programming languages support declarative methods to some 
-%                          extent, but functional and logic languages take the lead. In logic programming, you
-%                          query relations, but you don't specify *how* to query them.
+% Declarative Programming: Say *what you want*, not *how to get it*. The details of how to get it 
+% are left to the computer to figure out. All programming languages support declarative methods to 
+% some extent, but functional and logic languages take the lead. In logic programming, you
+% query relations, but you don't specify *how* to query them.
 
 % Q: What's a relation?
-% A: It's a subset of a product. The underlying relation of a function f : a -> b is the subset of the product (a, b)
-%    which picks out the pairs (x, y) such that f x == y.
+% A: It's a subset of a product. The underlying relation of a function f : a -> b is the subset 
+% of the product (a, b) which picks out the pairs (x, y) such that f x == y.
 %    
-%    In logic programming, we generalize to subsets of larger products (a_1, ..., a_n).
+% In logic programming, we generalize to subsets of larger products (a_1, ..., a_n).
 
 % Example of a fact about the list_length relation: the empty list has length 0
 list_length([], 0).
@@ -45,8 +44,9 @@ list_length([_|Ls], Len) :- % The length of a list [_|Ls] is Len whenever:
 % But because this is a full relation, we can also query it "backwards": 
 % list_length(Xs, 3).   
 % Xs = [_600, _942, _1284]
-% This gives a list of three unknowns, as expected. Unlike functional programming which always requires variables
-% to be bound to values, logic programming allows logic variables to be uninitialized
+% This gives a list of three unknowns, as expected. Unlike functional programming which always 
+% requires variables to be bound to values, logic programming allows logic variables to be 
+% uninitialized
 %
 % We can also query the entire relation for values:
 % list_length(Xs, N).
@@ -265,34 +265,37 @@ bintree_depth(node(_, Left, Right), N) :-
 
 
 
-% There is a street with three neighbouring houses that all have a different colour, namely red, blue, and 
-% green. People of different nationalities live in the different houses and they all have a different pet and sport. 
-% Here are some more facts about them:
+% There is a street with three neighbouring houses that all have a different colour, namely red, 
+% blue, and green. People of different nationalities live in the different houses and they all 
+% have a different pet and sport.  Here are some more facts about them:
 %
 % 1. The Brazilian does not live in house two.
 % 2. The person with the Dogs plays Basketball.
-% 3. There is one house between the house of the person who plays Football and the Red house on the right.
+% 3. There is one house between the house of the person who plays Football and the Red house on 
+%    the right.
 % 4. The person with the Fishes lives directly to the left of the person with the Cats.
 % 5. The person with the Dogs lives directly to the right of the Green house.
 % 6. The German lives in house three.
 
 % Q: Who keeps the Cats? Which Color house do they live in and which Sport do they play?
-zebra(ColorName, NatName, PetName, SportName) :-
+zebra(HouseNum, ColorName, NatName, PetName, SportName) :-
+  % Define variables whose values will match a house number in 1..3
   Colors        = [Red, Green, Blue],
   Nationalities = [Australian, Brazilian, German],
   Pets          = [Cats, Dogs, Fishes],
   Sports        = [Basketball, Football, Soccer],
   Attributes    = [Colors, Nationalities, Pets, Sports],
 
+  % Provide names for every variable 
   pairs_keys_values(ColorPairs, Colors, [red, green, blue]),
   pairs_keys_values(NatPairs, Nationalities, [australian, brazilian, german]),
   pairs_keys_values(PetPairs, Pets, [cats, dogs, fishes]),
   pairs_keys_values(SportPairs, Sports, [basketball, football, soccer]),
 
   append(Attributes, Vs),             % Flatten list of all variables
-  Vs ins 1..3,                        % Say each variable has a value in 1..3
+  Vs ins 1..3,                        % Say each variable has a value in 1..3: a house num
   maplist(all_distinct, Attributes),  % Each attribute consists of distinct values
-  Brazilian #\= 2,                    % Hint 1
+  Brazilian #\= 2,                    % Hint 1 (in terms of identifying house numbers)
   Dogs      #= Basketball,            % Hint 2
   Football  #= 1,                     % Hint 3
   Red       #= 3,                     % Hint 3 (cont'd)
@@ -300,9 +303,9 @@ zebra(ColorName, NatName, PetName, SportName) :-
   Dogs      #= Green + 1,             % Hint 5
   German    #= 3,                     % Hint 6
 
-  Nationality #= Cats,                      % Pull attributes for the solution  
-  member(Nationality-NatName, NatPairs),
-  member(Nationality-PetName, PetPairs),
-  member(Nationality-ColorName, ColorPairs),
-  member(Nationality-SportName, SportPairs).
+  member(HouseNum-NatName, NatPairs), % Pull solutions for each house number
+  member(HouseNum-PetName, PetPairs),
+  member(HouseNum-ColorName, ColorPairs),
+  member(HouseNum-SportName, SportPairs).
 
+% zebra(HouseNum, ColorName, NatName, PetName, SportName).
