@@ -14,7 +14,7 @@
 %
 % Logic Programming: Programs are queries against relations (in the sense of mathematics). You tell
 % the machine 1) facts about these relations and 2) rules to infer new facts. Composition is by
-% conjunciton and disjunction of predicates. No mutation, and no explicit control flow. Similar 
+% conjunction and disjunction of predicates. No mutation, and no explicit control flow. Similar 
 % to querying relations in SQL, but more powerful. 
 % 
 % Declarative Programming: Say *what you want*, not *how to get it*. The details of how to get it 
